@@ -4,6 +4,9 @@
 		{
 			"label": "clean (functions)",
 			"command": "dotnet",
+			"options": {
+				"cwd": "src"
+			},
 			"args": [
 				"clean",
 				"/property:GenerateFullPaths=true",
@@ -15,6 +18,9 @@
 		{
 			"label": "build (functions)",
 			"command": "dotnet",
+			"options": {
+				"cwd": "src"
+			},
 			"args": [
 				"build",
 				"/property:GenerateFullPaths=true",
@@ -31,6 +37,9 @@
 		{
 			"label": "clean release (functions)",
 			"command": "dotnet",
+			"options": {
+				"cwd": "src"
+			},
 			"args": [
 				"clean",
 				"--configuration",
@@ -44,6 +53,9 @@
 		{
 			"label": "publish (functions)",
 			"command": "dotnet",
+			"options": {
+				"cwd": "src"
+			},
 			"args": [
 				"publish",
 				"--configuration",
@@ -59,7 +71,7 @@
 			"type": "func",
 			"dependsOn": "build (functions)",
 			"options": {
-				"cwd": "${workspaceFolder}/bin/Debug/net6.0"
+				"cwd": "${workspaceFolder}/src/bin/Debug/net6.0"
 			},
 			"command": "host start",
 			"isBackground": true,
