@@ -8,4 +8,4 @@ DotNet Azure function that calculates the golden ratio.
 
 ## Usage
 
-The function app expects golden ration parameter 'ab' and returns a json object specifying the calculated values sides 'a' and 'b'.
+The function app expects golden ratio parameter 'ab' and returns a json object specifying the calculated values sides 'a' and 'b'.
