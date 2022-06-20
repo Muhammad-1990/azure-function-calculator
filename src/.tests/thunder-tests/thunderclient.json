@@ -3,14 +3,72 @@
     "_id": "0709bcf3-8790-44d5-91cc-7833d6e82230",
     "colId": "53f85f61-d361-40c4-a0da-2bca094d67ac",
     "containerId": "",
-    "name": "Calculate",
-    "url": "http://localhost:7071/api/v1/calculate/720",
+    "name": "Calculate-Golden-Ratio-SUCCESS",
+    "url": "http://localhost:7071/api/v1/CalculateGoldenRatio/720",
     "method": "GET",
     "sortNum": 10000,
     "created": "2022-06-17T15:02:45.392Z",
-    "modified": "2022-06-17T15:03:07.892Z",
+    "modified": "2022-06-20T10:18:39.493Z",
     "headers": [],
     "params": [],
-    "tests": []
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "json-query",
+        "custom": "json.ab",
+        "action": "equal",
+        "value": "720.0"
+      },
+      {
+        "type": "json-query",
+        "custom": "json.a",
+        "action": "equal",
+        "value": "444.99381953028430160692212608"
+      },
+      {
+        "type": "json-query",
+        "custom": "json.b",
+        "action": "equal",
+        "value": "275.02708252798782546781342774"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "cd80145f-e634-4c60-bc10-b107a7227b37",
+    "colId": "53f85f61-d361-40c4-a0da-2bca094d67ac",
+    "containerId": "",
+    "name": "Calculate-Golden-Ratio-FAILURE",
+    "url": "http://localhost:7071/api/v1/CalculateGoldenRatio/notextallowed",
+    "method": "GET",
+    "sortNum": 20000,
+    "created": "2022-06-20T10:19:44.225Z",
+    "modified": "2022-06-20T12:29:19.191Z",
+    "headers": [],
+    "params": [],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "equal",
+        "value": "Invalid input supplied"
+      }
+    ]
   }
 ]
