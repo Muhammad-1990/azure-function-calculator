@@ -41,7 +41,7 @@ jobs:
       - name: 'Resolve Project Dependencies Using Dotnet'
         shell: bash
         run: |
-          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          #pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
           dotnet build --configuration Release --output ./output
           
   test:
@@ -56,6 +56,6 @@ jobs:
       - name: 'Test function app'
         shell: bash
         run: |
-          pushd './${{ env.AZURE_FUNCTIONAPP_TEST_PATH }}'
+          #pushd './${{ env.AZURE_FUNCTIONAPP_TEST_PATH }}'
           dotnet test 
           popd
