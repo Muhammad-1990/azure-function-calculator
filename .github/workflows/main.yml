@@ -45,6 +45,7 @@ jobs:
           dotnet build --configuration Release --output ./output
           popd
   test:
+    needs: build
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     environment: dev
