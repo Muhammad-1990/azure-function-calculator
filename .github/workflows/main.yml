@@ -45,9 +45,9 @@ jobs:
           dotnet build --configuration Release --output ./output
           popd
       
-      - name: Test function app 
-          shell: bash
-          run: |
-            pushd './${{ env.AZURE_FUNCTIONAPP_TEST_PATH }}'
-            dotnet test 
-            popd
+      - name: 'Test function app'
+        shell: bash
+        run: |
+          pushd './${{ env.AZURE_FUNCTIONAPP_TEST_PATH }}'
+          dotnet test 
+          popd
