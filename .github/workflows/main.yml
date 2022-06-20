@@ -43,7 +43,7 @@ jobs:
         run: |
           pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
           dotnet build --configuration Release --output ./output
-          popd
+          
   test:
     needs: build
     # The type of runner that the job will run on
@@ -56,6 +56,6 @@ jobs:
       - name: 'Test function app'
         shell: bash
         run: |
-          pushd '${{ env.AZURE_FUNCTIONAPP_TEST_PATH }}'
+          pushd './${{ env.AZURE_FUNCTIONAPP_TEST_PATH }}'
           dotnet test 
           popd
