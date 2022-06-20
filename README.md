@@ -8,4 +8,40 @@ DotNet Azure function that calculates the golden ratio.
 
 ## Usage
 
+- working directory
+```
+cd /src
+```
+
+- Restore packages
+```
+dotnet restore
+```
+
+- Build project
+```
+dotnet build
+```
+
+- Run the function app
+```
+func start
+```
+
+
+### Debug
+- Additionally debugging can be started using F5
+
+navigate to the function link to perform the calculation:
+```
+http://localhost:7071/api/v1/calculate/{input}
+```
+
 The function app expects golden ratio parameter 'ab' and returns a json object specifying the calculated values sides 'a' and 'b'.
+
+```
+{
+    "ab":1080.0,
+    "a":667.49072929542645241038318912,
+    "b":412.54062379198173820172014161}
+```
