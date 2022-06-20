@@ -15,8 +15,8 @@ on:
 
 env:
   AZURE_FUNCTIONAPP_NAME: golden-ratio-calculator  # set this to your application's name
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: './src'    # set this to the path to your web app project, defaults to the repository root
-  AZURE_FUNCTIONAPP_TEST_PATH: './test' 
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: '~/src'    # set this to the path to your web app project, defaults to the repository root
+  AZURE_FUNCTIONAPP_TEST_PATH: '~/test' 
   DOTNET_VERSION: '6.0'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
