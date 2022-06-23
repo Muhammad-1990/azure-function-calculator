@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace GoldenCalculator
 {
@@ -42,7 +43,12 @@ namespace GoldenCalculator
             if(!decimal.TryParse(width, out decimal w))
                 throw new FormatException($"Cannot convert width({width}) to decimal.");
 
-            return new SquareModel(w).ToString();
+            decimal _width = w / 1.618M;
+            decimal _height = _width;
+
+            var square = new SquareModel{ Width = _width , Height = _height};
+
+            return JsonConvert.SerializeObject(square);
         });
 
         public async Task<string> CalculateThird(string width) => await Task.Run(() =>
