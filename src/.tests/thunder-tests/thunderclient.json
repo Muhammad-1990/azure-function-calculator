@@ -3,12 +3,12 @@
     "_id": "0709bcf3-8790-44d5-91cc-7833d6e82230",
     "colId": "53f85f61-d361-40c4-a0da-2bca094d67ac",
     "containerId": "",
-    "name": "Calculate-Golden-Ratio-SUCCESS",
-    "url": "http://localhost:7071/api/v1/CalculateGoldenRatio/720",
+    "name": "GetCircle-SUCCESS",
+    "url": "http://localhost:7071/api/v1/GetCircle/1080",
     "method": "GET",
     "sortNum": 10000,
     "created": "2022-06-17T15:02:45.392Z",
-    "modified": "2022-06-20T10:18:39.493Z",
+    "modified": "2022-06-23T14:53:23.091Z",
     "headers": [],
     "params": [],
     "tests": [
@@ -20,21 +20,21 @@
       },
       {
         "type": "json-query",
-        "custom": "json.ab",
+        "custom": "json.radius",
         "action": "equal",
-        "value": "720.0"
+        "value": "333.74536464771322620519159456"
       },
       {
         "type": "json-query",
-        "custom": "json.a",
+        "custom": "json.diameter",
         "action": "equal",
-        "value": "444.99381953028430160692212608"
+        "value": "667.49072929542645241038318912"
       },
       {
         "type": "json-query",
-        "custom": "json.b",
+        "custom": "json.circumference",
         "action": "equal",
-        "value": "275.02708252798782546781342774"
+        "value": "2095.9208899876390605686032138"
       },
       {
         "type": "res-body",
@@ -48,12 +48,12 @@
     "_id": "cd80145f-e634-4c60-bc10-b107a7227b37",
     "colId": "53f85f61-d361-40c4-a0da-2bca094d67ac",
     "containerId": "",
-    "name": "Calculate-Golden-Ratio-FAILURE",
-    "url": "http://localhost:7071/api/v1/CalculateGoldenRatio/notextallowed",
+    "name": "GetCircle-FAILURE",
+    "url": "http://localhost:7071/api/v1/GetCircle/asdf",
     "method": "GET",
-    "sortNum": 20000,
+    "sortNum": 12500,
     "created": "2022-06-20T10:19:44.225Z",
-    "modified": "2022-06-20T12:29:19.191Z",
+    "modified": "2022-06-23T14:55:52.825Z",
     "headers": [],
     "params": [],
     "tests": [
@@ -67,7 +67,73 @@
         "type": "res-body",
         "custom": "",
         "action": "equal",
-        "value": "Invalid input supplied"
+        "value": "Cannot convert width(asdf) to decimal."
+      }
+    ]
+  },
+  {
+    "_id": "5467a181-531a-4703-acbc-bdb5c25ff317",
+    "colId": "53f85f61-d361-40c4-a0da-2bca094d67ac",
+    "containerId": "",
+    "name": "GetSquare-SUCCESS",
+    "url": "http://localhost:7071/api/v1/GetSquare/1080",
+    "method": "GET",
+    "sortNum": 15000,
+    "created": "2022-06-23T14:54:59.841Z",
+    "modified": "2022-06-23T14:55:46.229Z",
+    "headers": [],
+    "params": [],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "json-query",
+        "custom": "json.width",
+        "action": "equal",
+        "value": "667.49072929542645241038318912"
+      },
+      {
+        "type": "json-query",
+        "custom": "json.height",
+        "action": "equal",
+        "value": "667.49072929542645241038318912"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "3b273c1b-eff0-40fa-8fd7-3aa73cd9de33",
+    "colId": "53f85f61-d361-40c4-a0da-2bca094d67ac",
+    "containerId": "",
+    "name": "GetSquare-FAILURE",
+    "url": "http://localhost:7071/api/v1/GetSquare/asdf",
+    "method": "GET",
+    "sortNum": 25000,
+    "created": "2022-06-23T14:55:55.701Z",
+    "modified": "2022-06-23T14:56:18.451Z",
+    "headers": [],
+    "params": [],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "equal",
+        "value": "Cannot convert width(asdf) to decimal."
       }
     ]
   }

@@ -5,7 +5,7 @@
 			"label": "clean (functions)",
 			"command": "dotnet",
 			"options": {
-				"cwd": "src/function"
+				"cwd": "src"
 			},
 			"args": [
 				"clean",
@@ -19,7 +19,7 @@
 			"label": "build (functions)",
 			"command": "dotnet",
 			"options": {
-				"cwd": "src/function"
+				"cwd": "src"
 			},
 			"args": [
 				"build",
@@ -38,7 +38,7 @@
 			"label": "clean release (functions)",
 			"command": "dotnet",
 			"options": {
-				"cwd": "src/function"
+				"cwd": "src"
 			},
 			"args": [
 				"clean",
@@ -54,7 +54,7 @@
 			"label": "publish (functions)",
 			"command": "dotnet",
 			"options": {
-				"cwd": "src/function"
+				"cwd": "src"
 			},
 			"args": [
 				"publish",
@@ -71,7 +71,7 @@
 			"type": "func",
 			"dependsOn": "build (functions)",
 			"options": {
-				"cwd": "${workspaceFolder}/src/function/bin/Debug/net6.0"
+				"cwd": "${workspaceFolder}/src/bin/Debug/net6.0"
 			},
 			"command": "host start",
 			"isBackground": true,

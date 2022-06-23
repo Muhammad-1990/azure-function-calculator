@@ -81,5 +81,170 @@
         "value": "Invalid input supplied"
       }
     ]
+  },
+  {
+    "_id": "543e9209-55b3-4b9f-b9e7-f2fee7816dd3",
+    "colId": "history",
+    "containerId": "",
+    "name": "http://localhost:7071/api/v1/GetCircle/1080",
+    "url": "http://localhost:7071/api/v1/GetCircle/1080",
+    "method": "GET",
+    "sortNum": 0,
+    "created": "2022-06-23T14:52:35.876Z",
+    "modified": "2022-06-23T14:53:23.100Z",
+    "headers": [],
+    "params": [],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "json-query",
+        "custom": "json.radius",
+        "action": "equal",
+        "value": "333.74536464771322620519159456"
+      },
+      {
+        "type": "json-query",
+        "custom": "json.diameter",
+        "action": "equal",
+        "value": "667.49072929542645241038318912"
+      },
+      {
+        "type": "json-query",
+        "custom": "json.circumference",
+        "action": "equal",
+        "value": "2095.9208899876390605686032138"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "713618e3-a68a-4eea-ac45-6bed774a08de",
+    "colId": "history",
+    "containerId": "",
+    "name": "http://localhost:7071/api/v1/GetCircle/notextallowed",
+    "url": "http://localhost:7071/api/v1/GetCircle/notextallowed",
+    "method": "GET",
+    "sortNum": 0,
+    "created": "2022-06-23T14:53:56.402Z",
+    "modified": "2022-06-23T14:53:56.432Z",
+    "headers": [],
+    "params": [],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "equal",
+        "value": "Invalid input supplied"
+      }
+    ]
+  },
+  {
+    "_id": "9e5e75b9-e69a-4efd-82bd-ee9ea62b3b85",
+    "colId": "history",
+    "containerId": "",
+    "name": "http://localhost:7071/api/v1/GetCircle/asdf",
+    "url": "http://localhost:7071/api/v1/GetCircle/asdf",
+    "method": "GET",
+    "sortNum": 0,
+    "created": "2022-06-23T14:54:13.152Z",
+    "modified": "2022-06-23T14:54:47.673Z",
+    "headers": [],
+    "params": [],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "equal",
+        "value": "Cannot convert width(asdf) to decimal."
+      }
+    ]
+  },
+  {
+    "_id": "f8cabcb4-6731-42e6-9def-0e972ed83ae6",
+    "colId": "history",
+    "containerId": "",
+    "name": "http://localhost:7071/api/v1/GetSquare/1080",
+    "url": "http://localhost:7071/api/v1/GetSquare/1080",
+    "method": "GET",
+    "sortNum": 0,
+    "created": "2022-06-23T14:55:23.281Z",
+    "modified": "2022-06-23T14:55:46.239Z",
+    "headers": [],
+    "params": [],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "json-query",
+        "custom": "json.width",
+        "action": "equal",
+        "value": "667.49072929542645241038318912"
+      },
+      {
+        "type": "json-query",
+        "custom": "json.height",
+        "action": "equal",
+        "value": "667.49072929542645241038318912"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "57f5590c-9a6b-4088-b2aa-88abf8ba0d8a",
+    "colId": "history",
+    "containerId": "",
+    "name": "http://localhost:7071/api/v1/GetSquare/asdf",
+    "url": "http://localhost:7071/api/v1/GetSquare/asdf",
+    "method": "GET",
+    "sortNum": 0,
+    "created": "2022-06-23T14:56:18.432Z",
+    "modified": "2022-06-23T14:56:18.463Z",
+    "headers": [],
+    "params": [],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "equal",
+        "value": "Cannot convert width(asdf) to decimal."
+      }
+    ]
   }
 ]

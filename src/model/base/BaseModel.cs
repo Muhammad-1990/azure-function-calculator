@@ -1,18 +1,9 @@
 using Newtonsoft.Json;
 
-namespace GoldenRatioCalculator
+namespace GoldenCalculator
 {
-    public class GoldenRatio
+    public class BaseModel
     {
-        [JsonProperty("ab")]
-        public decimal Ab { get; set; }
-
-        [JsonProperty("a")]
-        public decimal A { get; set; }
-        
-        [JsonProperty("b")]
-        public decimal B { get; set; }
-
         public override string ToString()
         {
             return JsonConvert.SerializeObject(this,
