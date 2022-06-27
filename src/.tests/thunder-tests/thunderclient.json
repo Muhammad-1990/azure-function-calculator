@@ -8,7 +8,7 @@
     "method": "GET",
     "sortNum": 10000,
     "created": "2022-06-17T15:02:45.392Z",
-    "modified": "2022-06-23T14:53:23.091Z",
+    "modified": "2022-06-27T10:12:02.645Z",
     "headers": [],
     "params": [],
     "tests": [
@@ -20,21 +20,21 @@
       },
       {
         "type": "json-query",
-        "custom": "json.radius",
+        "custom": "json.Diameter",
         "action": "equal",
-        "value": "333.74536464771322620519159456"
+        "value": "667.49"
       },
       {
         "type": "json-query",
-        "custom": "json.diameter",
+        "custom": "json.Circumference",
         "action": "equal",
-        "value": "667.49072929542645241038318912"
+        "value": "2095.92"
       },
       {
         "type": "json-query",
-        "custom": "json.circumference",
+        "custom": "json.Radius",
         "action": "equal",
-        "value": "2095.9208899876390605686032138"
+        "value": "333.75"
       },
       {
         "type": "res-body",
@@ -80,7 +80,7 @@
     "method": "GET",
     "sortNum": 15000,
     "created": "2022-06-23T14:54:59.841Z",
-    "modified": "2022-06-23T14:55:46.229Z",
+    "modified": "2022-06-27T10:11:30.132Z",
     "headers": [],
     "params": [],
     "tests": [
@@ -92,15 +92,15 @@
       },
       {
         "type": "json-query",
-        "custom": "json.width",
+        "custom": "json.Width",
         "action": "equal",
-        "value": "667.49072929542645241038318912"
+        "value": "667.49"
       },
       {
         "type": "json-query",
-        "custom": "json.height",
+        "custom": "json.Height",
         "action": "equal",
-        "value": "667.49072929542645241038318912"
+        "value": "667.49"
       },
       {
         "type": "res-body",

@@ -23,6 +23,29 @@ namespace GoldenCalculator
             _calculatorService = calculateService;
         }
 
+        [FunctionName(nameof(Calculator.GetCircle))]
+        [OpenApiOperation(operationId: "GetCircle", tags: new[] { "Calculate Circle diamentions" }, Summary = "Gets the width and height of Circle", Description = "Gets the width and height of Circle", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
+        [OpenApiParameter(name: "width", In = ParameterLocation.Path, Required = true, Type = typeof(string), Summary = "The width used to calculate the Circle", Description = "The width used to calculate the Circle", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(string), Summary = "Circle diamentions", Description = "Circle diamentions")]
+        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Cannot convert width to decimal", Description = "Cannot convert width to decimal")]
+        public async Task<IActionResult> GetCircle(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "v1/GetCircle/{width}")] HttpRequest req,
+            string width,
+            ILogger log)
+        {
+            log.LogInformation("C# HTTP trigger GetCircle function processed a request.");
+
+            try
+            {
+                return new OkObjectResult((await _calculatorService.CalculateCircle(width)).ToString());
+            }
+            catch (Exception e)
+            {
+                return new BadRequestObjectResult(e.Message);
+            }
+        }
+
         [FunctionName(nameof(Calculator.GetRectangle))]
         [OpenApiOperation(operationId: "GetRectangle", tags: new[] { "Calculate Rectangle diamentions" }, Summary = "Gets the width and height of regtangle", Description = "Gets the width and height of regtangle", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
@@ -34,7 +57,7 @@ namespace GoldenCalculator
             string width,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger calculate function processed a request.");
+            log.LogInformation("C# HTTP trigger GetRectangle function processed a request.");
 
             try
             {
@@ -57,126 +80,11 @@ namespace GoldenCalculator
             string width,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger calculate function processed a request.");
+            log.LogInformation("C# HTTP trigger GetSquare function processed a request.");
 
             try
             {
                 return new OkObjectResult((await _calculatorService.CalculateSquare(width)).ToString());
-            }
-            catch (Exception e)
-            {
-                return new BadRequestObjectResult(e.Message);
-            }
-        }
-
-        [FunctionName(nameof(Calculator.GetCircle))]
-        [OpenApiOperation(operationId: "GetCircle", tags: new[] { "Calculate Circle diamentions" }, Summary = "Gets the width and height of Circle", Description = "Gets the width and height of Circle", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
-        [OpenApiParameter(name: "width", In = ParameterLocation.Path, Required = true, Type = typeof(string), Summary = "The width used to calculate the Circle", Description = "The width used to calculate the Circle", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(string), Summary = "Circle diamentions", Description = "Circle diamentions")]
-        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Cannot convert width to decimal", Description = "Cannot convert width to decimal")]
-        public async Task<IActionResult> GetCircle(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "v1/GetCircle/{width}")] HttpRequest req,
-            string width,
-            ILogger log)
-        {
-            log.LogInformation("C# HTTP trigger calculate function processed a request.");
-
-            try
-            {
-                return new OkObjectResult((await _calculatorService.CalculateCircle(width)).ToString());
-            }
-            catch (Exception e)
-            {
-                return new BadRequestObjectResult(e.Message);
-            }
-        }
-
-        [FunctionName(nameof(Calculator.GetGrid))]
-        [OpenApiOperation(operationId: "GetGrid", tags: new[] { "Calculate Grid diamentions" }, Summary = "Gets the width and height of Grid", Description = "Gets the width and height of Grid", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
-        [OpenApiParameter(name: "width", In = ParameterLocation.Path, Required = true, Type = typeof(string), Summary = "The width used to calculate the Grid", Description = "The width used to calculate the Grid", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(string), Summary = "Grid diamentions", Description = "Grid diamentions")]
-        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Cannot convert width to decimal", Description = "Cannot convert width to decimal")]
-        public async Task<IActionResult> GetGrid(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "v1/GetGrid/{width}")] HttpRequest req,
-            string width,
-            ILogger log)
-        {
-            log.LogInformation("C# HTTP trigger calculate function processed a request.");
-
-            try
-            {
-                return new OkObjectResult((await _calculatorService.CalculateGrid(width)).ToString());
-            }
-            catch (Exception e)
-            {
-                return new BadRequestObjectResult(e.Message);
-            }
-        }
-
-        [FunctionName(nameof(Calculator.GetInverseTriangle))]
-        [OpenApiOperation(operationId: "GetInverseTriangle", tags: new[] { "Calculate Inverse Triangle diamentions" }, Summary = "Gets the width and height of Inverse Triangle", Description = "Gets the width and height of Inverse Triangle", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
-        [OpenApiParameter(name: "width", In = ParameterLocation.Path, Required = true, Type = typeof(string), Summary = "The width used to calculate the Inverse Triangle", Description = "The width used to calculate the Inverse Triangle", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(string), Summary = "Inverse Triangle diamentions", Description = "Inverse Triangle diamentions")]
-        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Cannot convert width to decimal", Description = "Cannot convert width to decimal")]
-        public async Task<IActionResult> GetInverseTriangle(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "v1/GetInverseTriangle/{width}")] HttpRequest req,
-            string width,
-            ILogger log)
-        {
-            log.LogInformation("C# HTTP trigger calculate function processed a request.");
-
-            try
-            {
-                return new OkObjectResult((await _calculatorService.CalculateInverseTriangle(width)).ToString());
-            }
-            catch (Exception e)
-            {
-                return new BadRequestObjectResult(e.Message);
-            }
-        }
-
-        [FunctionName(nameof(Calculator.GetTriangle))]
-        [OpenApiOperation(operationId: "GetTriangle", tags: new[] { "Calculate Triangle diamentions" }, Summary = "Gets the width and height of Triangle", Description = "Gets the width and height of Triangle", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
-        [OpenApiParameter(name: "width", In = ParameterLocation.Path, Required = true, Type = typeof(string), Summary = "The width used to calculate the Triangle", Description = "The width used to calculate the Triangle", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(string), Summary = "Triangle diamentions", Description = "Triangle diamentions")]
-        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Cannot convert width to decimal", Description = "Cannot convert width to decimal")]
-        public async Task<IActionResult> GetTriangle(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "v1/GetTriangle/{width}")] HttpRequest req,
-            string width,
-            ILogger log)
-        {
-            log.LogInformation("C# HTTP trigger calculate function processed a request.");
-
-            try
-            {
-                return new OkObjectResult((await _calculatorService.CalculateTriangle(width)).ToString());
-            }
-            catch (Exception e)
-            {
-                return new BadRequestObjectResult(e.Message);
-            }
-        }        
-
-        [FunctionName(nameof(Calculator.GetThird))]
-        [OpenApiOperation(operationId: "GetThird", tags: new[] { "Calculate Third diamentions" }, Summary = "Gets the width and height of Third", Description = "Gets the width and height of Third", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiSecurity("function_key", SecuritySchemeType.ApiKey, Name = "code", In = OpenApiSecurityLocationType.Query)]
-        [OpenApiParameter(name: "width", In = ParameterLocation.Path, Required = true, Type = typeof(string), Summary = "The width used to calculate the Third", Description = "The width used to calculate the Third", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(string), Summary = "Third diamentions", Description = "Third diamentions")]
-        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest, Summary = "Cannot convert width to decimal", Description = "Cannot convert width to decimal")]
-        public async Task<IActionResult> GetThird(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "v1/GetThird/{width}")] HttpRequest req,
-            string width,
-            ILogger log)
-        {
-            log.LogInformation("C# HTTP trigger calculate function processed a request.");
-
-            try
-            {
-                return new OkObjectResult((await _calculatorService.CalculateThird(width)).ToString());
             }
             catch (Exception e)
             {
