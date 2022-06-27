@@ -31,7 +31,8 @@ bld/
 #wwwroot/
 
 # MSTest test Results
-[Tt]est[Rr]esult*/
+[Cc]overagereport*/
+[Tt]est[Rr]esults*/
 [Bb]uild[Ll]og.*
 
 # NUNIT
