@@ -7,8 +7,10 @@ on:
   workflow_dispatch:
   
 env:
-  AZURE_FUNCTIONAPP_NAME: mo-test-func # set this to the name of your azure function app resource
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'
+  AZURE_FUNCTIONAPP_NAME: mo-test-func
+  AZURE_FUNCTION_PROJ_PATH: './src'
+  AZURE_FUNCTION_TEST_PATH: './test'
+  AZURE_FUNCTION_PUBLISH_PATH: '.'
   DOTNET_VERSION: '6.0'
 
 jobs:
@@ -26,21 +28,21 @@ jobs:
         
       - name: Restore
         run: dotnet restore
-        working-directory: ${{ github.workspace }}
+        working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
 
       - name: Build
         run: dotnet build --no-restore
-        working-directory: ${{ github.workspace }}
+        working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
       
       - name: Publish For Deployment
-        run: dotnet publish --no-build --no-restore --configuration Release --output ./${{ env.AZURE_FUNCTIONAPP_NAME }}
-        working-directory: ${{ github.workspace }}
+        run: dotnet publish --no-build --no-restore --configuration Release --output ./publish
+        working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
 
       - name: Upload artifact for testing and deployment
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-          path: ${{ github.workspace }}/${{ env.AZURE_FUNCTIONAPP_NAME }}
+          path: ${{ env.AZURE_FUNCTION_PROJ_PATH }}/publish
       
   test:
     runs-on: ubuntu-latest
@@ -52,7 +54,7 @@ jobs:
       
       - name: Test
         run: dotnet test
-        working-directory: ${{ github.workspace }}/test
+        working-directory: ${{ env.AZURE_FUNCTION_TEST_PATH }}
 
   deploy:
 
@@ -72,5 +74,5 @@ jobs:
         id: fa
         with:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          package: ${{ env.AZURE_FUNCTION_PUBLISH_PATH }}
           publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_CREDS }}
