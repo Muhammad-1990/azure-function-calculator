@@ -55,5 +55,5 @@ jobs:
           name: mo-test-func
       
       - name: Test
-        run: dotnet test
+        run: dotnet test --no-restore --configuration Release
         working-directory: ${{ env.AZURE_FUNCTION_TEST_PATH }}
