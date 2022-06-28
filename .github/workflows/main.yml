@@ -1,62 +1,98 @@
-# This is a basic workflow to help you get started with Actions
+name: Build, Test and Deploy to PROD
 
-name: Build Azure Function App
-
-# Controls when the workflow will run
+# controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
+  # triggers the workflow on pull request events for the 'main' branch, only when source code files have been modified
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    # paths: 
+    #   - 'src/**'
+    #   - 'test/**'
 
-  # Allows you to run this workflow manually from the Actions tab
+  # allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 env:
-  AZURE_FUNCTIONAPP_NAME: golden-ratio-calculator  # set this to your application's name
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: './src'    # set this to the path to your web app project, defaults to the repository root
-  AZURE_FUNCTIONAPP_TEST_PATH: './test' 
+  # function app name as displayed in azure portal
+  AZURE_FUNCTIONAPP_NAME: mo-test-func
+  # set this to the path of your function app csproj file
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: './src'
+  # set this to the path of your test csproj file    
+  AZURE_FUNCTIONAPP_TEST_PATH: './test'
+  # set this to the target dotnet version as set in the function app csproj file
   DOTNET_VERSION: '6.0'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
+
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    environment: dev
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-
 
       - name: Setup DotNet ${{ env.DOTNET_VERSION }} Environment
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: 'Resolve Project Dependencies Using Dotnet'
-        shell: bash
-        run: |
-          pushd '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          dotnet build --configuration Release --output ./output
+      - name: Resolve Project Dependencies Using Dotnet
+        run: dotnet restore
+        working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+      
+      - name: Build Project For Testing Using Dotnet
+        run: dotnet build --no-restore --configuration Release
+        working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+
+      - name: Publish Project For Release Using Dotnet
+        run: dotnet publish -c Release -o ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          path: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output
+  # ===============================================================================================================================
           
   test:
     needs: build
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    environment: dev
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
+
+      - name: Test Project Using Dotnet
+        run: dotnet test
+        working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+  # ===============================================================================================================================
+
+  deploy:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    needs: [build, test]
+    environment:
+      name: production
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
       
-      - name: 'Test function app'
-        shell: bash
-        run: |
-          pushd '${{ env.AZURE_FUNCTIONAPP_TEST_PATH }}'
-          dotnet test 
+      - name: 'Run Azure Functions Action'
+        uses: Azure/functions-action@v1
+        id: fa
+        with:
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          package: '${{ env.AZURE_FUNCTION_PROJ_PATH }}/output'
+          publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_CREDS }}
+  # ===============================================================================================================================
+
