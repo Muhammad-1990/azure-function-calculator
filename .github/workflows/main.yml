@@ -31,18 +31,18 @@ jobs:
         working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
 
       - name: Build
-        run: dotnet build --no-restore
+        run: dotnet build --no-restore --configuration Release
         working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
       
       - name: Publish For Deployment
-        run: dotnet publish --no-build --no-restore --configuration Release --output ./publish
+        run: dotnet publish --no-build --no-restore --configuration Release --output ./wwwroot
         working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
 
       - name: Upload artifact for testing and deployment
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-          path: ${{ env.AZURE_FUNCTION_PROJ_PATH }}/publish
+          path: ${{ env.AZURE_FUNCTION_PROJ_PATH }}/wwwroot
       
   test:
     runs-on: ubuntu-latest
@@ -51,9 +51,17 @@ jobs:
     steps:
       - name: Get the latest source code commit
         uses: actions/checkout@v2
+
+      - name: Restore
+        run: dotnet restore
+        working-directory: ${{ env.AZURE_FUNCTION_TEST_PATH }}
+      
+      - name: Build
+        run: dotnet build --no-restore
+        working-directory: ${{ env.AZURE_FUNCTION_TEST_PATH }}
       
       - name: Test
-        run: dotnet test
+        run: dotnet test --no-restore
         working-directory: ${{ env.AZURE_FUNCTION_TEST_PATH }}
 
   deploy:
