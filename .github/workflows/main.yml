@@ -1,4 +1,4 @@
-name: Test and Deploy (Functions Action)
+name: Build-Test-Deploy
 
 on:
   # push:
@@ -7,19 +7,17 @@ on:
   workflow_dispatch:
   
 env:
-  AZURE_FUNCTIONAPP_NAME: mo-test-func # set this to the name of your azure function app resource
-  AZURE_FUNCTION_PROJ_PATH: './src'  # set this to the path to your function app project
-  AZURE_FUNCTION_TEST_PATH: './test'
-  ROOT_SOLUTION_PATH: './'
+  AZURE_FUNCTIONAPP_NAME: mo-test-func
   DOTNET_VERSION: '6.0'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     
-    steps:    
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Get the latest source code commit
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
@@ -28,32 +26,35 @@ jobs:
         
       - name: Restore dependencies
         run: dotnet restore
-        working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
+        working-directory: '${{ github.workspace }}/src'
 
-      - name: Build For Testing
+      - name: Build
         run: dotnet build --no-restore --configuration Release
-        working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
+        working-directory: '${{ github.workspace }}/src'
       
-      - name: Publish For Deployment
-        run: dotnet publish --no-build --no-restore --configuration Release --output ./output
-        working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
 
-      - name: Upload artifact for testing and deployment
-        uses: actions/upload-artifact@v3
-        with:
-          name: mo-test-func
-          path: ${{ env.ROOT_SOLUTION_PATH }}
       
-  test:
-    runs-on: ubuntu-latest
-    needs: build
+  # test:
+  #   runs-on: ubuntu-latest
+  #   needs: build
 
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: mo-test-func
+  #   steps:
+  #     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+  #     - uses: actions/checkout@v3
       
-      - name: Test
-        run: dotnet test --no-restore --configuration Release
-        working-directory: ${{ env.AZURE_FUNCTION_TEST_PATH }}
+  #     - name: Test
+  #       run: dotnet test --no-restore --configuration Release
+  #       working-directory: ${{ env.AZURE_FUNCTION_TEST_PATH }}
+
+
+
+
+      #         - name: Publish For Deployment
+      #   run: dotnet publish --no-build --no-restore --configuration Release --output ./output
+      #   working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
+
+      # - name: Upload artifact for deployment
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: mo-test-func
+      #     path: ${{ env.AZURE_FUNCTION_PROJ_PATH }}/output
