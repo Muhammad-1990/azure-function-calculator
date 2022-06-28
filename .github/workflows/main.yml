@@ -8,9 +8,7 @@ on:
   
 env:
   AZURE_FUNCTIONAPP_NAME: mo-test-func # set this to the name of your azure function app resource
-  AZURE_FUNCTION_PROJ_PATH: './src'  # set this to the path to your function app project
-  AZURE_FUNCTION_TEST_PATH: './test'
-  ROOT_SOLUTION_PATH: './'
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'
   DOTNET_VERSION: '6.0'
 
 jobs:
@@ -28,36 +26,51 @@ jobs:
         
       - name: Restore
         run: dotnet restore
-        working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
+        working-directory: ${{ github.workspace }}
 
       - name: Build
         run: dotnet build --no-restore
-        working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
-
-      - name: Test
-        run: dotnet test
-        working-directory: ${{ env.AZURE_FUNCTION_TEST_PATH }}
+        working-directory: ${{ github.workspace }}
       
       - name: Publish For Deployment
-        run: dotnet publish --no-build --no-restore --configuration Release --output ./output
-        working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
+        run: dotnet publish --no-build --no-restore --configuration Release --output ./${{ env.AZURE_FUNCTIONAPP_NAME }}
+        working-directory: ${{ github.workspace }}
 
       - name: Upload artifact for testing and deployment
         uses: actions/upload-artifact@v3
         with:
-          name: mo-test-func
-          path: ${{ env.AZURE_FUNCTION_PROJ_PATH }}/output
+          name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          path: ${{ github.workspace }}/${{ env.AZURE_FUNCTIONAPP_NAME }}
       
-  # test:
-  #   runs-on: ubuntu-latest
-  #   needs: build
+  test:
+    runs-on: ubuntu-latest
+    needs: build
 
-  #   steps:
-  #     - name: Download artifact from build job
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: mo-test-func
+    steps:
+      - name: Get the latest source code commit
+        uses: actions/checkout@v2
       
-  #     - name: Test
-  #       run: dotnet test --no-restore --configuration Release
-  #       working-directory: ${{ env.AZURE_FUNCTION_TEST_PATH }}
+      - name: Test
+        run: dotnet test
+        working-directory: ${{ github.workspace }}/test
+
+  deploy:
+
+    runs-on: ubuntu-latest
+    needs: [build, test]
+    environment:
+      name: production
+    
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+      
+      - name: 'Run Azure Functions Action'
+        uses: Azure/functions-action@v1
+        id: fa
+        with:
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_CREDS }}
