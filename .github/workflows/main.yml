@@ -6,11 +6,9 @@ on:
 
   workflow_dispatch:
 
-concurrency: ci-${{ github.event.number }}
-
 env:
   RESOURCE_GROUP: mo-delete
-  SLOT_NAME: pr-${{ github.event.number }}
+  SLOT_NAME: stagging
   AZURE_FUNCTIONAPP_NAME: mo-test-func
   AZURE_FUNCTION_PROJ_PATH: './src'
   AZURE_FUNCTION_TEST_PATH: './test'
