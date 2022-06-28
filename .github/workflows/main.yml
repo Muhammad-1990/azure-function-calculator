@@ -5,8 +5,12 @@ on:
   #   branches: [ main ]
 
   workflow_dispatch:
-  
+
+concurrency: ci-${{ github.event.number }}
+
 env:
+  RESOURCE_GROUP: mo-delete
+  SLOT_NAME: pr-${{ github.event.number }}
   AZURE_FUNCTIONAPP_NAME: mo-test-func
   AZURE_FUNCTION_PROJ_PATH: './src'
   AZURE_FUNCTION_TEST_PATH: './test'
@@ -14,73 +18,86 @@ env:
   DOTNET_VERSION: '6.0'
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    
-    steps:    
-      - name: Get the latest source code commit
-        uses: actions/checkout@v2
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+  # build:
+  #   runs-on: ubuntu-latest
+    
+  #   steps:    
+  #     - name: Get the latest source code commit
+  #       uses: actions/checkout@v2
+
+  #     - name: Setup .NET
+  #       uses: actions/setup-dotnet@v1
+  #       with:
+  #         dotnet-version: ${{ env.DOTNET_VERSION }}
         
-      - name: Restore
-        run: dotnet restore
-        working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
+  #     - name: Restore
+  #       run: dotnet restore
+  #       working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
 
-      - name: Build
-        run: dotnet build --no-restore --configuration Release
-        working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
+  #     - name: Build
+  #       run: dotnet build --no-restore --configuration Release
+  #       working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
       
-      - name: Publish For Deployment
-        run: dotnet publish --no-build --no-restore --configuration Release --output ./wwwroot
-        working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
+  #     - name: Publish For Deployment
+  #       run: dotnet publish --no-build --no-restore --configuration Release --output ./wwwroot
+  #       working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
 
-      - name: Upload artifact for testing and deployment
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-          path: ${{ env.AZURE_FUNCTION_PROJ_PATH }}/wwwroot
+  #     - name: Upload artifact for testing and deployment
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+  #         path: ${{ env.AZURE_FUNCTION_PROJ_PATH }}/wwwroot
       
-  test:
+  # test:
+  #   runs-on: ubuntu-latest
+  #   needs: build
+
+  #   steps:
+  #     - name: Get the latest source code commit
+  #       uses: actions/checkout@v2
+
+  #     - name: Restore
+  #       run: dotnet restore
+  #       working-directory: ${{ env.AZURE_FUNCTION_TEST_PATH }}
+      
+  #     - name: Build
+  #       run: dotnet build --no-restore
+  #       working-directory: ${{ env.AZURE_FUNCTION_TEST_PATH }}
+      
+  #     - name: Test
+  #       run: dotnet test --no-restore
+  #       working-directory: ${{ env.AZURE_FUNCTION_TEST_PATH }}
+
+  set-up-test-env:
+    name: Create test env
     runs-on: ubuntu-latest
-    needs: build
 
     steps:
-      - name: Get the latest source code commit
-        uses: actions/checkout@v2
+    - name: Log into Azure CLI with service principal
+      uses: azure/login@v1.1
+      with:
+        publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_CREDS }}
 
-      - name: Restore
-        run: dotnet restore
-        working-directory: ${{ env.AZURE_FUNCTION_TEST_PATH }}
-      
-      - name: Build
-        run: dotnet build --no-restore
-        working-directory: ${{ env.AZURE_FUNCTION_TEST_PATH }}
-      
-      - name: Test
-        run: dotnet test --no-restore
-        working-directory: ${{ env.AZURE_FUNCTION_TEST_PATH }}
+    - name: Create slot on staging site
+      run: az webapp deployment slot create --resource-group $RESOURCE_GROUP  --name $AZURE_FUNCTIONAPP_NAME --slot $SLOT_NAME
 
-  deploy:
-
-    runs-on: ubuntu-latest
-    needs: [build, test]
-    environment:
-      name: production
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   needs: [build, test]
+  #   environment:
+  #     name: production
     
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v2
-        with:
-          name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+  #   steps:
+  #     - name: Download artifact from build job
+  #       uses: actions/download-artifact@v2
+  #       with:
+  #         name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
       
-      - name: 'Run Azure Functions Action'
-        uses: Azure/functions-action@v1
-        id: fa
-        with:
-          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-          package: ${{ env.AZURE_FUNCTION_PUBLISH_PATH }}
-          publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_CREDS }}
+  #     - name: 'Run Azure Functions Action'
+  #       uses: Azure/functions-action@v1
+  #       id: fa
+  #       with:
+  #         app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+  #         package: ${{ env.AZURE_FUNCTION_PUBLISH_PATH }}
+  #         publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_CREDS }}
