@@ -80,7 +80,7 @@ jobs:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Create slot on staging site
-      run: az webapp deployment slot create --resource-group $RESOURCE_GROUP  --name $AZURE_FUNCTIONAPP_NAME --slot $SLOT_NAME
+      run: az functionapp deployment slot create --resource-group $RESOURCE_GROUP  --name $AZURE_FUNCTIONAPP_NAME --slot $SLOT_NAME
 
   # deploy:
   #   runs-on: ubuntu-latest
