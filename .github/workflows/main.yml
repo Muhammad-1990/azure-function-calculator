@@ -50,11 +50,13 @@ jobs:
       - name: Publish Project For Release Using Dotnet
         run: dotnet publish -c Release
 
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
           path: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+
   # ===============================================================================================================================
           
   test:
