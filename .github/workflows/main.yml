@@ -1,8 +1,8 @@
 name: Test and Deploy (Functions Action)
 
 on:
-  push:
-    branches: [ main ]
+  # push:
+  #   branches: [ main ]
 
   workflow_dispatch:
   
@@ -10,6 +10,8 @@ env:
   AZURE_FUNCTIONAPP_NAME: mo-test-func # set this to the name of your azure function app resource
   AZURE_FUNCTION_PROJ_PATH: './src'  # set this to the path to your function app project
   AZURE_FUNCTION_TEST_PATH: './test'
+  ROOT_SOLUTION_PATH: './'
+  DOTNET_VERSION: '6.0'
 
 jobs:
   build:
@@ -17,10 +19,10 @@ jobs:
     
     steps:    
       - name: Get the latest source code commit
-        uses: actions/checkout@v2
+        uses: actions/checkout@latest
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@latest
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
         
@@ -28,22 +30,29 @@ jobs:
         run: dotnet restore
         working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
 
-      - name: Build for Testing
-        run: dotnet build --no-restore
+      - name: Build For Testing
+        run: dotnet build --no-restore --configuration Release
         working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
       
-      - name: Test
-        run: dotnet test --no-build --verbosity normal
-        working-directory: ${{ env.AZURE_FUNCTION_TEST_PATH }}
-      
-      - name: Build Function App for Release
-        run: dotnet build --configuration Release --output ./output
+      - name: Publish For Deployment
+        run: dotnet publish --no-build --no-restore --configuration Release --output ./output
         working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
 
-      - name: 'Run Azure Functions Action'
-        uses: Azure/functions-action@v1
-        id: fa
+      - name: Upload artifact for testing and deployment
+        uses: actions/upload-artifact@latest
         with:
-          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-          package: '${{ env.AZURE_FUNCTION_PROJ_PATH }}/output'
-          publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_CREDS }}
+          name: mo-test-func
+          path: ${{ env.ROOT_SOLUTION_PATH }}
+      
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@latest
+        with:
+          name: mo-test-func
+      
+      - name: Test
+        run: dotnet test --no-restore --configuration Release
+        working-directory: ${{ env.AZURE_FUNCTION_TEST_PATH }}
