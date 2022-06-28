@@ -1,100 +1,49 @@
-name: Build, Test and Deploy to PROD
+name: Test and Deploy (Functions Action)
 
-# controls when the workflow will run
 on:
-  # triggers the workflow on pull request events for the 'main' branch, only when source code files have been modified
   push:
-    branches: [ "main" ]
-    # paths: 
-    #   - 'src/**'
-    #   - 'test/**'
+    branches: [ main ]
 
-  # allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
+  
 env:
-  # function app name as displayed in azure portal
-  AZURE_FUNCTIONAPP_NAME: mo-test-func
-  # set this to the path of your function app csproj file
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: './src'
-  # set this to the path of your test csproj file    
-  AZURE_FUNCTIONAPP_TEST_PATH: './test'
-  # set this to the target dotnet version as set in the function app csproj file
-  DOTNET_VERSION: '6.0'
+  AZURE_FUNCTIONAPP_NAME: mo-test-func # set this to the name of your azure function app resource
+  AZURE_FUNCTION_PROJ_PATH: './src'  # set this to the path to your function app project
+  AZURE_FUNCTION_TEST_PATH: './test'
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    
+    steps:    
+      - name: Get the latest source code commit
+        uses: actions/checkout@v2
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
-
-      - name: Setup DotNet ${{ env.DOTNET_VERSION }} Environment
+      - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Resolve Project Dependencies Using Dotnet
+        
+      - name: Restore dependencies
         run: dotnet restore
-        working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
+
+      - name: Build for Testing
+        run: dotnet build --no-restore
+        working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
       
-      - name: Build Project For Testing Using Dotnet
-        run: dotnet build --no-restore --configuration Release
-        working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-
-      - name: Publish Project For Release Using Dotnet
-        run: dotnet publish -c Release
-
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-          path: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-
-  # ===============================================================================================================================
-          
-  test:
-    needs: build
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
-
-      - name: Test Project Using Dotnet
-        run: dotnet test
-        working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-  # ===============================================================================================================================
-
-  deploy:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-    needs: [build, test]
-    environment:
-      name: production
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+      - name: Test
+        run: dotnet test --no-build --verbosity normal
+        working-directory: ${{ env.AZURE_FUNCTION_TEST_PATH }}
       
+      - name: Build Function App for Release
+        run: dotnet build --configuration Release --output ./output
+        working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
+
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
         id: fa
         with:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-          package: '${{ env.AZURE_FUNCTION_PROJ_PATH }}'
+          package: '${{ env.AZURE_FUNCTION_PROJ_PATH }}/output'
           publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_CREDS }}
-  # ===============================================================================================================================
-
