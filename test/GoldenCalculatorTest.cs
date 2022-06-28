@@ -218,7 +218,7 @@ namespace GoldenCalculator
             var response = new Calculator(CalculatorServiceMoq.Object).GetSquare(HttpReqMoq.Object, "", logger.Object);
             
             // Assert
-            Assert.IsAssignableFrom<BadRequestObjectResult>(response.Result);
+            Assert.IsAssignableFrom<OkObjectResult>(response.Result);
         }
     }
 }
