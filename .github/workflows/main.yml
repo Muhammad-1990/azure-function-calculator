@@ -31,11 +31,11 @@ jobs:
         working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
 
       - name: Build
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build --no-restore
         working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
 
       - name: Test
-        run: dotnet test --no-restore --configuration Release
+        run: dotnet test
         working-directory: ${{ env.AZURE_FUNCTION_TEST_PATH }}
       
       - name: Publish For Deployment
