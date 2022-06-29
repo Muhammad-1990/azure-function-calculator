@@ -1,4 +1,4 @@
-name: Deploy PR to staging env
+name: Deploy Pull Request To Stagging
 
 on:
   pull_request:
@@ -51,6 +51,7 @@ jobs:
   test:
     name: Run xUnit Tests
     runs-on: ubuntu-latest
+    needs: [build]
 
     steps:
       - name: Get the latest source code commit
@@ -71,7 +72,7 @@ jobs:
   create-stagging-slot:
     name: Create Stagging Slot
     runs-on: ubuntu-latest
-    needs: [build]
+    needs: [test]
     steps:
       - name: Log into Azure CLI with service principal
         uses: azure/login@v1.1
@@ -83,7 +84,7 @@ jobs:
   deploy:
     name: Deploy To Stagging Slot
     runs-on: ubuntu-latest
-    needs: [build, create-stagging-slot]
+    needs: [build,create-stagging-slot]
     environment:
       name: 'Stagging'
       url: ${{ steps.deploy-to-stagging.outputs.app-url }}
@@ -119,27 +120,3 @@ jobs:
             > *This is an automated message.*
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           repo-token-user-login: 'github-actions[bot]'
-
-
-
-
-
-  # deploy:
-  #   runs-on: ubuntu-latest
-  #   needs: [build, test]
-  #   environment:
-  #     name: stagging
-    
-  #   steps:
-  #     - name: Download artifact from build job
-  #       uses: actions/download-artifact@v2
-  #       with:
-  #         name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-      
-  #     - name: 'Run Azure Functions Action'
-  #       uses: Azure/functions-action@v1
-  #       id: fa
-  #       with:
-  #         app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-  #         package: ${{ env.AZURE_FUNCTION_PUBLISH_PATH }}
-  #         publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_CREDS }}

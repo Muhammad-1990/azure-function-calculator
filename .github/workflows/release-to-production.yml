@@ -1,0 +1,112 @@
+name: Release To Production
+
+on:
+  push:
+    branches:
+    - main
+
+env:
+  RESOURCE_GROUP: mo-delete
+  SLOT_NAME: stagging
+  AZURE_FUNCTIONAPP_NAME: mo-test-func
+  AZURE_FUNCTION_PROJ_PATH: './src'
+  AZURE_FUNCTION_TEST_PATH: './test'
+  AZURE_FUNCTION_PUBLISH_PATH: './'
+  DOTNET_VERSION: '6.0'
+
+jobs:
+  build:
+    name: Build Project
+    runs-on: ubuntu-latest
+    
+    steps:    
+      - name: Checkout the latest source code commit
+        uses: actions/checkout@v2
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+      - name: Restore Project Dependencies
+        run: dotnet restore
+        working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
+
+      - name: Build Function App Project
+        run: dotnet build --no-restore --configuration Release
+        working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
+      
+      - name: Publish Function App For Deployment
+        run: dotnet publish --configuration Release --output ./publish
+        working-directory: ${{ env.AZURE_FUNCTION_PROJ_PATH }}
+
+      - name: Upload Artifact for Deployment
+        uses: actions/upload-artifact@v3
+        with:
+          name: mo-test-func
+          path: ${{ env.AZURE_FUNCTION_PROJ_PATH }}/publish
+      
+  test:
+    name: Run xUnit Tests
+    runs-on: ubuntu-latest
+    needs: [build]
+
+    steps:
+      - name: Get the latest source code commit
+        uses: actions/checkout@v2
+
+      - name: Restore
+        run: dotnet restore
+        working-directory: ${{ env.AZURE_FUNCTION_TEST_PATH }}
+      
+      - name: Build
+        run: dotnet build --no-restore
+        working-directory: ${{ env.AZURE_FUNCTION_TEST_PATH }}
+      
+      - name: Test
+        run: dotnet test --no-restore
+        working-directory: ${{ env.AZURE_FUNCTION_TEST_PATH }}
+  
+  deploy-to-stagging:
+    name: Deploy To Stagging Slot
+    runs-on: ubuntu-latest
+    needs: [build,test]
+    environment:
+      name: 'Stagging'
+      url: ${{ steps.deploy-to-stagging.outputs.app-url }} 
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+
+      - name: Log into Azure CLI with service principal
+        uses: azure/login@v1.1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }} 
+
+      - name: Deploy To Stagging
+        uses: Azure/functions-action@v1
+        id: deploy-to-stagging
+        with: 
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          slot-name:  ${{ env.SLOT_NAME }}
+          package: ${{ env.AZURE_FUNCTION_PUBLISH_PATH }}
+
+  release-to-prod:
+    name: Release to prod
+    needs: deploy-to-stage
+    runs-on: ubuntu-latest
+    environment:
+      name: 'Production'
+      url: 'https://${{ env.AZURE_FUNCTIONAPP_NAME }}.azurewebsites.net/'
+
+    steps:
+    - name: Log into Azure CLI with service principal
+      uses: azure/login@v1.1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Swap slots
+      run: az webapp deployment slot swap -s ${{ env.SLOT_NAME }} -n ${{ env.AZURE_FUNCTIONAPP_NAME }} -g ${{ env.RESOURCE_GROUP }}
