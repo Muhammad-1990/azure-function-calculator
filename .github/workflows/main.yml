@@ -1,4 +1,4 @@
-name: Test and Deploy (Functions Action)
+name: Deploy PR to staging env
 
 on:
   pull_request:
@@ -51,7 +51,6 @@ jobs:
   test:
     name: Run xUnit Tests
     runs-on: ubuntu-latest
-    needs: build
 
     steps:
       - name: Get the latest source code commit
@@ -84,10 +83,10 @@ jobs:
   deploy:
     name: Deploy To Stagging Slot
     runs-on: ubuntu-latest
-    needs: [create-stagging-slot]
+    needs: [build, create-stagging-slot]
     environment:
       name: ${{ env.SLOT_NAME }}
-      url: ${{ steps.deploy-to-stagging.outputs.webapp-url }}
+      url: ${{ steps.deploy-to-stagging.outputs.app-url }}
     permissions:
       pull-requests: write  
 
@@ -114,7 +113,7 @@ jobs:
         uses: mshick/add-pr-comment@v1
         with:
           message: |
-            ## Stagging link: https://${{ env.AZURE_FUNCTIONAPP_NAME }}-${{env.SLOT_NAME }}.azurewebsites.net  
+            ## Stagging link: ${{ steps.deploy-to-stagging.outputs.app-url }} 
             - Your changes have been deployed to stagging. The stagging site will update as you add more commits to this branch.
             - The stagging link is shareable, but will be deleted when the pull request is merged or closed.
             > *This is an automated message.*
