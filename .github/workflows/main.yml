@@ -85,7 +85,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build, create-stagging-slot]
     environment:
-      name: ${{ env.SLOT_NAME }}
+      name: 'Stagging'
       url: ${{ steps.deploy-to-stagging.outputs.app-url }}
     permissions:
       pull-requests: write  
