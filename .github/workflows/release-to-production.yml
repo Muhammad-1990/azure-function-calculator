@@ -96,7 +96,7 @@ jobs:
 
   release-to-prod:
     name: Release to prod
-    needs: deploy-to-stage
+    needs: deploy-to-stagging
     runs-on: ubuntu-latest
     environment:
       name: 'Production'
