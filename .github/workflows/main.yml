@@ -82,7 +82,7 @@ jobs:
   deploy:
     name: Deploy to test env
     runs-on: ubuntu-latest
-    needs: [build, test, set-up-test-env]
+    needs: [build, test]
     # environment:
     #   name: ${{ env.SLOT_NAME }}
     #   url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
