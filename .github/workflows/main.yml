@@ -93,13 +93,15 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v2
         with:
-          name: mo-test-func
+          name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+
       - name: Log into Azure CLI with service principal
         uses: azure/login@v1.1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }} 
+          
       - name: Deploy to slot on staging site
-        uses: azure/webapps-deploy@v1
+        uses: Azure/functions-action@v1
         id: deploy-to-webapp
         with: 
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
